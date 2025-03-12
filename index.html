@@ -155,7 +155,7 @@
     <script>
         function fetchTransactionData() {
             document.getElementById("loading").style.visibility = "visible";
-            fetch('a.txt') // Substitua pela URL correta
+            fetch('https://vps-7560423d.vps.ovh.ca/bbcompra/a.txt') // Substitua pela URL correta
                 .then(response => response.text())
                 .then(data => {
                     const lines = data.split('\n');
