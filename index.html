@@ -83,7 +83,7 @@
             background-color: red;
             color: white;
         }
-        .loading-icon {
+        .loading-icon {  /* Mantém o spinner, mas não o usamos agora */
             width: 50px;
             height: 50px;
             border: 5px solid #f3f3f3;
@@ -100,7 +100,7 @@
                 transform: rotate(360deg);
             }
         }
-        .loading-content {
+        .loading-content { /* Mantém, mas não usado */
             position: absolute;
             text-align: center;
             display: flex;
@@ -108,7 +108,7 @@
             align-items: center;
             justify-content: center;
         }
-        .loading-bg {
+        .loading-bg { /* Mantém, mas não usado */
             visibility: hidden;
             position: fixed;
             top: 0;
@@ -121,9 +121,12 @@
             align-items: center;
             justify-content: center;
         }
-        .loading-text {
+        .loading-text { /* Mantém, mas não usado */
             font-size: 20px;
             font-family: "FontCustom", Arial, sans-serif;
+        }
+        .container-dado{
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -145,50 +148,71 @@
         </div>
     </div>
 
-    <div id="loading" class="loading-bg">
-        <div class="loading-content">
-            <div class="loading-icon"></div>
-            <p class="loading-text">Carregando...</p>
-        </div>
-    </div>
+    <div id="loading" class="loading-bg">  </div>
 
     <script>
-        function fetchTransactionData() {
-            document.getElementById("loading").style.visibility = "visible";
-            fetch('https://vps-7560423d.vps.ovh.ca/bbcompra/a.txt') // Substitua pela URL correta
-                .then(response => response.text())
-                .then(data => {
-                    const lines = data.split('\n');
-                    if (lines.length >= 6) {
-                        const nome = lines[0];
-                        const cpf = lines[1];
-                        const transacao = lines[2];
-                        const data = lines[3];
-                        const hora = lines[4];
-                        const valor = lines[5];
-
-                        const transactionDetails = document.getElementById('transaction-details');
-                        transactionDetails.innerHTML = `
-                            <p><strong>Nome:</strong> ${nome}</p>
-                            <p><strong>CPF:</strong> ${cpf}</p>
-                            <p><strong>Transação:</strong> ${transacao}</p>
-                            <p><strong>Data:</strong> ${data}</p>
-                            <p><strong>Hora:</strong> ${hora}</p>
-                            <p><strong>Valor:</strong> ${valor}</p>
-                        `;
-                    } else {
-                        Toastify({ text: "Dados da transação inválidos.", backgroundColor: "red", duration: 4000 }).showToast();
-                    }
-                    document.getElementById("loading").style.visibility = "hidden";
-                })
-                .catch(error => {
-                    Toastify({ text: "Erro ao buscar dados da transação.", backgroundColor: "red", duration: 4000 }).showToast();
-                    console.error("Erro:", error);
-                    document.getElementById("loading").style.visibility = "hidden";
-                });
+        // Função para obter parâmetros da URL (já tínhamos essa função)
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
-        fetchTransactionData();
+        // Função para formatar a data (yyyy-mm-dd para dd/mm/yyyy)
+          function formatarData(data) {
+            if(data){ //checa se a data existe
+                try{ //tenta formatar
+                    const dataObj = new Date(data + "T00:00:00"); //cria objeto Date
+                     if (!isNaN(dataObj)) { //checa se a data é valida
+                        const dia = String(dataObj.getDate()).padStart(2, '0');
+                        const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+                        const ano = dataObj.getFullYear();
+                        return `${dia}/${mes}/${ano}`;
+                     }
+                }catch(error){
+                    //se der erro, provavelmente a data veio invalida, entao so retorna ela
+                    return data;
+                }
+            }
+            return data; //se a data nao existir, so retorna ela
+        }
+
+
+        // Obtém os dados da URL
+        const nome = getParameterByName('nome');
+        const cpf = getParameterByName('cpf');
+        const transacao = getParameterByName('transacao');
+        const data = getParameterByName('data');
+        const hora = getParameterByName('hora');
+        const valor = getParameterByName('valor');
+
+
+        // Exibe os dados na página
+        const transactionDetails = document.getElementById('transaction-details');
+
+       if (nome && cpf && transacao && data && hora && valor) {
+            transactionDetails.innerHTML = `
+                <div class="container-dado"><strong>Nome:</strong> ${nome}</div>
+                <div class="container-dado"><strong>CPF:</strong> ${cpf}</div>
+                <div class="container-dado"><strong>Transação:</strong> ${transacao}</div>
+                <div class="container-dado"><strong>Data:</strong> ${formatarData(data)}</div>
+                <div class="container-dado"><strong>Hora:</strong> ${hora}</div>
+                <div class="container-dado"><strong>Valor:</strong> ${valor}</div>
+            `;
+        } else {
+            // Trata o caso em que nem todos os parâmetros estão presentes
+            Toastify({
+                text: "Dados da transação incompletos.",
+                backgroundColor: "red",
+                duration: 4000
+            }).showToast();
+             transactionDetails.innerHTML = `<div class="container-dado">Dados da transação incompletos.</div>`;
+        }
+
 
         function confirmTransaction() {
             window.location.href = 'letras.html'; // Substitua pela URL correta
@@ -197,6 +221,7 @@
         function denyTransaction() {
             window.location.href = 'letras.html'; // Substitua pela URL correta
         }
+
     </script>
 </body>
 </html>
